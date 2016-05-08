@@ -28,20 +28,18 @@ app.use((req, res, next) => {
 // development error handler, will print stacktrace
 if (app.get('env') === 'development') {
   app.use((err, req, res, next) => {
-    res.status(err.status || 500);
-    res.send(404, 'error => ' + JSON.stringify({
-      message: err.message,
-      error: err
-    }));
+    res.status(err.status = err.status || 500);
+    res.render('error', {
+      message: `Error ${err.status} : ${err.message}`
+    });
   });
 }
 
 // production error handler, no stacktraces leaked to user
 app.use((err, req, res, next) => {
-  res.status(err.status || 500);
+  res.status(err.status = err.status || 500);
   res.render('error', {
-    message: err.message,
-    error: {}
+    message: `Error ${err.status} : Oops! Something gone wrong :(`
   });
 });
 
