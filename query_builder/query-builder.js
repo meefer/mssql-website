@@ -8,18 +8,19 @@ class QueryBuilder {
     this.connect = sql.connect(config)
       .catch(err => { throw err; });
     this._templates = {
-      select: 'SELECT @columns FROM @tables @expr.where @expr.group_by @expr.having @expr.order_by',
+      select: 'SELECT @dist @top @columns FROM @tables @expr.where @expr.group_by @expr.having @expr.order_by @expr.offset',
       insert: 'INSERT INTO @tables (@columns) VALUES (@values)',
       update: 'UPDATE @tables SET @colEqValPairs @expr.where',
       delete: 'DELETE FROM @tables @expr.where'
     };
     this.mode = 'select';
-    this.tables = this.columns = this.values = this.colEqValPairs = '';
+    this.tables = this.columns = this.values = this.colEqValPairs = this.dist = this.top = '';
     this.expr = {
       where: '',
       group_by: '',
       having: '',
-      order_by: ''
+      order_by: '',
+      offset: ''
     };
   }
 
@@ -29,6 +30,16 @@ class QueryBuilder {
     else {
       this.columns = args.join(',');
     }
+    return this;
+  }
+  
+  distinct() {
+    this.dist = 'DISTINCT';
+    return this;
+  }
+  
+  top(number) {
+    this.top = `TOP ${number}`.trim();
     return this;
   }
 
@@ -47,6 +58,25 @@ class QueryBuilder {
     }
     return this;
   }
+  
+  groupBy (...columns) {
+    this.expr.group_by = columns.join(',');
+    return this;
+  } // add { col1: 'ASC', col2: 'DESC' }
+  
+  orderBy(...columns) {
+    this.expr.order_by = columns.join(',');
+    return this;
+  }
+  
+  having() {
+    return this;
+  }
+  
+  offsetFetch(offsetNumber, fetchNumber) {
+    this.expr.offset = `${offsetNumber} ROWS FETCH NEXT ${fetchNumber} ROWS ONLY`;
+    return this;
+  }
 
   insert(into, values) { // values => { column1: value1, column2: value2 }
     this.mode = 'insert';
@@ -62,6 +92,26 @@ class QueryBuilder {
     return this;
   }
 
+  delete(fromTable) {
+    this.mode = 'delete';
+    this.table = fromTable;
+    return this;
+  }
+
+  update(table, values) {
+    this.mode = 'update';
+    this.tables = table;
+    let keyValueArr = [];
+    let keys = Object.keys(values);
+    keys.forEach((key) => {
+      let value = values[key];
+      if (typeof value === 'string') value = `N'${value}'`;
+      keyValueArr.push(`${key}=${value}`);
+    });
+    this.colEqValPairs = keyValueArr.join(',');
+    return this;
+  }
+
   _interpolate(template) {
     return template.replace(/@((\w|\.)+)/g, (_, prop) => {
       if (~prop.indexOf('.')) {
@@ -74,8 +124,52 @@ class QueryBuilder {
     }).trim();
   }
 
+  _where(delimiter, raw = '', ...args) {
+    if (delimiter) this.expr.where += ` ${delimiter} `;
+    this.expr.where += `${raw} ${args[0] || ''} ${args[1] || ''}`.trim();
+    return this;
+  }
+
+  where(raw, ...args) {
+    this.expr.where = '';
+    return _where('', raw, ...args);
+  }
+  or(raw, ...args) {
+    return _where('OR', raw, ...args);
+  }
+  and(raw = '', ...args) {
+    return _where('AND', raw, ...args);
+  }
+
+  join(tableMap) { // tableMap => [ 'Person AS p': false, ... ] where 'false' stands for 'do not reverse'
+    let prevAlias = '', prevTableName = '';
+    for (let [table, reversed] of tableMap) {
+      let [tableName, , alias] = table.split(' ');
+      if (!this.tables) {
+        this.tables = table;
+      }
+      else {
+        if (!reversed) {
+          this.tables += ` JOIN ${table} ON ${prevAlias}.Id = ${alias}.${prevTableName}Id`;
+        }
+        else {
+          this.tables += ` JOIN ${table} ON ${alias}.Id = ${prevAlias}.${tableName}Id`;
+        }
+      }
+      [prevAlias, prevTableName] = [alias, tableName];
+    }
+    return this;
+  }
+
+  _cleanup() {
+    this.mode = 'select';
+    this.tables = this.columns = this.values = this.colEqValPairs = this.dist = this.top = '';
+    this.expr = {};
+  }
+  
   exec() {
     let queryString = this._interpolate(this._templates[this.mode]);
+    this._cleanup();
     return this.connect.then(() => {
       let fn = null, req = new sql.Request();
       if (this.mode !== 'select')

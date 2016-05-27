@@ -1,0 +1,21 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">Buildings</div>
+    <div class="panel-body">
+        <div class="control-group">  
+            <div class="btn-group btn-group-md">
+                <button type="button" id="new-btn" class="btn btn-primary">New</button>
+                <button type="button" id="edit-btn" class="btn btn-primary">Edit</button>
+                <button type="button" id="delete-btn" class="btn btn-primary">Delete</button>
+                <button type="button" id="filter-btn" class="btn btn-primary">Filter</button>
+            </div>
+        </div>
+        <br/>
+        <div id="page-content"></div>
+    </div>
+</div>
+
+<div class="text-center">
+    <ul id="pagination" class="pagination-sm" data-total="{{total}}"></ul>
+</div>
+<script src="/js/jquery.twbsPagination.min.js"></script>
+<script src="/js/initiatePagination.js"></script>
