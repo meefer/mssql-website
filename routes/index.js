@@ -8,19 +8,16 @@ const qb = require('../query_builder/query-builder')({
   password: '111111',
   database: 'Hospital'
 });
-const building = require('../controllers/building');
+const building = require('../controllers/building')(qb);
 
 router.use(query());
 // GET home page
 router.get('/', (req, res, next) => {
   res.render('home');
 });
-router.get('/buildings', building.getBuildings.bind(null, qb));
-router.post('/building', bodyParser.urlencoded({ extended: true }), (req, res) => {
-  res.send(`INSERT ${JSON.stringify(req.body)}`);
-});
-router.put('/building/:id', bodyParser.urlencoded({ extended: true }), (req, res) => {
-  res.send(`UPDATE ${JSON.stringify(req.body)} WHERE ID = ${req.params.id}`);
-});
+router.get('/buildings', building.getBuildings);
+router.post('/building', bodyParser.urlencoded({ extended: true }), building.postBuilding);
+router.put('/building/:id', bodyParser.urlencoded({ extended: true }), building.putBuilding);
+router.delete('/building/:id', building.deleteBuilding);
 
 module.exports = router;

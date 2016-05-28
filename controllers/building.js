@@ -1,41 +1,40 @@
-let recordCount = 20;
-module.exports = {
-  getBuildings(qb, req, res, next) {
-    if (!req.query.page) {
-      qb.select('COUNT(*) AS total')
-        .from('Building')
-        .exec()
-        .then((resultset) => {
-          res.render('buildings.handlebars', { total: Math.ceil(resultset[0].total / recordCount) });
-        }).catch(next);
-    } else {
-      qb.select()
-        .from('Building')
-        .orderBy('Name')
-        .offsetFetch((req.query.page - 1)*recordCount, recordCount)
-        .exec()
-        .then((resultset) => {
-          res.json(resultset);
-        }).catch(next);
-    }
-  },
-  postBuildings(qb, req, res, next) {
-    qb.insert('Building', {
-      Name: '-',
-      Address: '-',
-      Number: 3
-    }).exec()
-      .then((resultset) => {
-        res.status(200).send(JSON.stringify(resultset));
+module.exports = function (qb) {
+  let recordCount = 20;
+  const crudServ = require('../services/crud')(qb);
+  return {
+    getBuildings(req, res, next) {
+      if (!req.query.page && !req.query.order && !req.query.filter) {
+        crudServ.selectColumns('Building', 'COUNT(*) AS total')
+          .then((resultset) => {
+            res.render('buildings.handlebars', { total: Math.ceil(resultset[0].total / recordCount) });
+          }).catch(next);
+      } else {
+        crudServ.selectAll('Building', req.query)
+          .then((resultset) => {
+            res.json(resultset);
+          }).catch(next);
+      }
+    },
+    putBuilding(req, res, next) {
+      crudServ.update('Building', req.body, req.params.id).then((resultset) => {
+        return crudServ.selectAll('Building', req.query);
+      }).then((resultset) => {
+        res.json(resultset);
       }).catch(next);
-  },
-  test(qb, req, res, next) {
-    res.status(200).send(qb.join(new Map([
-      ['Building AS B', false],
-      ['Room AS R', false],
-      ['RoomEquipmentSet AS RES', false],
-      ['RoomEquipment AS RE', true]
-    ]))
-    );
-  }
-};
+    },
+    postBuilding(req, res, next) {
+      crudServ.insertInto('Building', req.body).then((resultset) => {
+        return crudServ.selectAll('Building', req.query);
+      }).then((resultset) => {
+        res.json(resultset);
+      }).catch(next);
+    },
+    deleteBuilding(req, res, next) {
+      crudServ.deleteFrom('Building', req.params.id).then((resultset) => {
+        return crudServ.selectAll('Building', req.query);
+      }).then((resultset) => {
+        res.json(resultset);
+      }).catch(next);
+    }
+  };
+}

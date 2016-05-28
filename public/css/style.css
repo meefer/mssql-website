@@ -3,8 +3,9 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+.btn-group[class*="col-"] {
+  padding-right: 0;
+  padding-left: 0;
 }
 
 #logo {

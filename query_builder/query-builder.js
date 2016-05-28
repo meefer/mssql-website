@@ -5,6 +5,7 @@ module.exports = (config) => new QueryBuilder(config);
 
 class QueryBuilder {
   constructor(config) {
+    this.sql = sql;
     this.connect = sql.connect(config)
       .catch(err => { throw err; });
     this._templates = {
@@ -39,7 +40,7 @@ class QueryBuilder {
   }
   
   top(number) {
-    this.top = `TOP ${number}`.trim();
+    this.top = `TOP ${number}`;
     return this;
   }
 
@@ -69,11 +70,13 @@ class QueryBuilder {
     return this;
   }
   
-  having() {
+  having(predicate) {
+    this.expr.having = predicate;
     return this;
   }
   
   offsetFetch(offsetNumber, fetchNumber) {
+    if(offsetNumber < 0) offsetNumber = 0;
     this.expr.offset = `${offsetNumber} ROWS FETCH NEXT ${fetchNumber} ROWS ONLY`;
     return this;
   }
@@ -94,7 +97,7 @@ class QueryBuilder {
 
   delete(fromTable) {
     this.mode = 'delete';
-    this.table = fromTable;
+    this.tables = fromTable;
     return this;
   }
 
@@ -132,13 +135,13 @@ class QueryBuilder {
 
   where(raw, ...args) {
     this.expr.where = '';
-    return _where('', raw, ...args);
+    return this._where('', raw, ...args);
   }
   or(raw, ...args) {
-    return _where('OR', raw, ...args);
+    return this._where('OR', raw, ...args);
   }
   and(raw = '', ...args) {
-    return _where('AND', raw, ...args);
+    return this._where('AND', raw, ...args);
   }
 
   join(tableMap) { // tableMap => [ 'Person AS p': false, ... ] where 'false' stands for 'do not reverse'
@@ -167,12 +170,16 @@ class QueryBuilder {
     this.expr = {};
   }
   
-  exec() {
+  exec(params) {
     let queryString = this._interpolate(this._templates[this.mode]);
+    let mode = this.mode;
     this._cleanup();
     return this.connect.then(() => {
       let fn = null, req = new sql.Request();
-      if (this.mode !== 'select')
+      if(params) {
+        params.forEach((paramObj) => { req.input(paramObj.name, paramObj.value); })
+      }
+      if (mode !== 'select')
         fn = () => { return Promise.resolve(req.rowsAffected); };
       return req.query(queryString).then(fn);
     });
