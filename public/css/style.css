@@ -3,6 +3,15 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
+.input-group-btn:last-child > .btn-grouped {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.glyphicon-btn {
+  vertical-align: -1px;
+}
+
 .btn-group[class*="col-"] {
   padding-right: 0;
   padding-left: 0;

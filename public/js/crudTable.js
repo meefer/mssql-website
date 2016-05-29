@@ -2,18 +2,22 @@ $(document).ready(() => {
   $('#pagination').twbsPagination({
     totalPages: $('#pagination').data('total'),
     visiblePages: 20,
-    onPageClick: (event, page) => {
-      $.ajax({
-        url: `/buildings?page=${page}`,
-        method: 'GET'
-      }).fail((jqXHR, textStatus) => {
-        alert('Request failed: ' + textStatus);
-      }).done((data) => {
-        refreshTable(data);
-      });
+    onPageClick: (_, page) => {
+      requestPage(page);
     }
   });
 });
+
+let requestPage = (page) => {
+  $.ajax({
+    url: `/buildings?page=${page}${generateFilter(true)}`,
+    method: 'GET'
+  }).fail((jqXHR, textStatus) => {
+    alert('Request failed: ' + textStatus);
+  }).done((data) => {
+    refreshTable(data);
+  });
+}
 
 let renderTable = (data, sortNumber, asc) => {
   const ID = 'Id';
@@ -31,7 +35,7 @@ let renderTable = (data, sortNumber, asc) => {
         let asc = !($(this).children('span').attr('class').split(' ').some((c) => c == 'glyphicon-sort-by-attributes'));
         $.ajax({
           method: 'GET',
-          url: `${url}${asc}${generateFilter('&')}`
+          url: `${url}${asc}${generateFilter(true)}`
         }).done((data) => {
           refreshTable(data, null, i, asc);
         }).fail((jqXHR, textStatus) => {
@@ -130,7 +134,7 @@ let openEditModal = (modalName, modalId, method, url, record) => {
     let form = $('<form></form>').addClass('form-horizontal')
       .submit(function (e) {
         e.preventDefault();
-        if($.grep($(':input', $(this)), (input) => $(input).val() === '').length != 0) return;
+        if ($.grep($(':input', $(this)), (input) => $(input).val() === '').length != 0) return;
         $.ajax({
           method,
           url,
@@ -203,34 +207,49 @@ let openEditModal = (modalName, modalId, method, url, record) => {
 $('#edit-btn').click(() => {
   let record = $('#data-table > tbody > tr[class$="active"]');
   if (!record.length) return;
-  openEditModal('Record Editor', 'edit-modal', 'PUT', `/building/${record.data('id')}`, record);
+  openEditModal('Record Editor', 'edit-modal', 'PUT', `/building/${record.data('id')}${generateFilter()}`, record);
 });
 
 $('#new-btn').click(() => {
-  openEditModal('New Record', 'new-modal', 'POST', '/building');
+  openEditModal('New Record', 'new-modal', 'POST', `/building${generateFilter()}`);
 });
 
 $('#delete-btn').click(() => {
   let record = $('#data-table > tbody > tr[class$="active"]');
   if (!record.length) return;
-  openDeleteModal('Delete Record', 'delete-modal', `/building/${record.data('id')}`);
+  openDeleteModal('Delete Record', 'delete-modal', `/building/${record.data('id')}${generateFilter()}`);
 });
 
 let filterQuery = '';
-let generateFilter = (beginningSymbol) => {
-  return `${beginningSymbol}${filterQuery}`;
+let generateFilter = (appendingForm) => {
+  return filterQuery ? `${appendingForm ? '&' : '?'}${filterQuery}` : '';
+}
+$.fn.textContent = function() {
+  return this.contents().filter(function () {
+    return this.nodeType == 3;
+  }).text().trim();
+}
+let createFilterResetButton = () => {
+  let resetButton = $('<button></button>').addClass('btn btn-default').attr('type', 'button');
+  resetButton.append($('<span></span>').addClass('glyphicon glyphicon-remove glyphicon-btn').attr('aria-hidden', 'true'))
+    .click(function () {
+      filterQuery = '';
+      requestPage(1);
+      $(this).remove();
+    }).insertBefore($('#dropdown-btn'));
 }
 $('#filter-btn').click(() => {
-  let column = $('#dropdown-btn').text().split(' ')[0],
-    value = $('#column-input').val().trim(), query;
-  if (column === '' || value === '') query = '';
-  else query = `&filter=${column}&value=${value}`;
+  let column = $('#dropdown-btn').textContent(),
+    value = $('#column-input').val().trim(), query = '';
+  if (column === '' || value === '') return;
+  query = `filter=${column}&value=${value}`;
   $.ajax({
     method: 'GET',
-    url: `/buildings?page=1${query}`
+    url: `/buildings?${query}`
   }).done((data) => {
     refreshTable(data);
-    filterQuery = query.slice(1, query.length);
+    createFilterResetButton();
+    filterQuery = query;
   }).fail((jqXHR, textStatus) => {
     filterQuery = '';
     alert("Request failed: " + textStatus);
@@ -241,10 +260,9 @@ $('#dropdown-btn').one('click', () => {
   let dropdown = $('#column-dropdown');
   $('#data-table > thead th').each(function () {
     dropdown.append($('<li></li>').append(
-      $('<a></a>').attr('href', '#').text($(this).text().split(' ')[0])
+      $('<a></a>').attr('href', '#').text($(this).textContent())
     ));
   });
-  $('li a', dropdown).eq(0).click();
 });
 $('#column-dropdown').on('click', 'li a', function (e) {
   e.preventDefault();

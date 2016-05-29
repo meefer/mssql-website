@@ -1,37 +1,25 @@
 <div class="panel panel-primary">
     <div class="panel-heading">Buildings</div>
     <div class="panel-body">
-        <div class="control-group">  
-            <!--<div class="btn-group btn-group-md">
-                <button type="button" id="new-btn" class="btn btn-primary">New</button>
-                <button type="button" id="edit-btn" class="btn btn-primary">Edit</button>
-                <button type="button" id="delete-btn" class="btn btn-primary">Delete</button>
-            </div>-->
-            <!--<div class = "input-group">
-                <span class = "input-group-btn">
+        <div class="row">
+            <div class="col-md-3 col-sm-4">
+                <div class="btn-group ">
                     <button type="button" id="new-btn" class="btn btn-primary">New</button>
                     <button type="button" id="edit-btn" class="btn btn-primary">Edit</button>
                     <button type="button" id="delete-btn" class="btn btn-primary">Delete</button>
-                </span>
-                <input type = "text" class = "form-control">
-                <span class = "input-group-btn">
-                    <button type="button" id="filter-btn" class="btn btn-primary">Filter</button>
-                </span>
-            </div>-->
-            <div class="btn-group col-md-4">
-                <button type="button" id="new-btn" class="btn btn-primary">New</button>
-                <button type="button" id="edit-btn" class="btn btn-primary">Edit</button>
-                <button type="button" id="delete-btn" class="btn btn-primary">Delete</button>
+                </div>
             </div>
-            <div class = "input-group col-md-4 col-md-offset-8">
-                <input type = "text" id="column-input" class = "form-control">
-                <span class = "input-group-btn">
-                    <button type="button" id="dropdown-btn" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-                        <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu" role="menu" id="column-dropdown" aria-labelledby="dropdown-btn"></ul>
-                    <button type="button" id="filter-btn" class="btn btn-primary">Filter</button>
-                </span>
+            <div class="col-md-5 col-md-offset-4 col-sm-8">
+                <div class = "input-group">
+                    <input type = "text" id="column-input" class = "form-control">
+                    <span class = "input-group-btn">
+                        <button type="button" id="dropdown-btn" class="btn btn-default btn-grouped dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" id="column-dropdown" aria-labelledby="dropdown-btn"></ul>
+                        <button type="button" id="filter-btn" class="btn btn-primary">Filter</button>
+                    </span>
+                </div>
             </div>
         </div>
         <br/>
@@ -43,4 +31,4 @@
     <ul id="pagination" class="pagination-sm" data-total="{{total}}"></ul>
 </div>
 <script src="/js/jquery.twbsPagination.min.js"></script>
-<script src="/js/initiatePagination.js"></script>
+<script src="/js/crudTable.js"></script>
