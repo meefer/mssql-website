@@ -3,7 +3,8 @@ var path = require('path');
 var handlebars = require('express-handlebars')
   .create({ defaultLayout: 'layout' });
 
-var routes = require('./routes/index');
+var tableRoutes = require('./routes/tableRouter');
+var mainRoutes = require('./routes/mainRouter');
 
 var app = express();
 
@@ -15,7 +16,8 @@ app.disable('x-powered-by');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/table/', tableRoutes);
+app.use('/', mainRoutes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

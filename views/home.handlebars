@@ -1,3 +1,17 @@
-<div class="page-header">
-    <h3>Welcome, one table underneeth</h3>
+<h3>Welcome to <strong>Hospital</strong>!</h3>
+<div class="panel panel-primary">
+    <div class="panel-heading">Quick start tables</div>
+    <div class="panel-body">
+        <div class="container-fluid">
+            <div class="row">
+                {{#each qsTables}}
+                    <a href="/table/{{url}}">
+                        <div class="col-xs-6 col-sm-4 col-md-3 col-lg-2">
+                            {{name}}
+                        </div>
+                    </a>
+                {{/each}}
+            </div>
+        </div>
+    </div>
 </div>

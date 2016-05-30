@@ -1,0 +1,30 @@
+{
+    "quickStartTables": [
+        { "url": "proceduretypes", "name": "ProcedureType" },
+        { "url": "diagnosistypes", "name": "DiagnosisType" },
+        { "url": "diseases", "name": "Disease" },
+        { "url": "medicines", "name": "Medicine" },
+        { "url": "institutions", "name": "Institution" },
+        { "url": "specializations", "name": "Specialization" },
+        { "url": "professionalcategories", "name": "ProfessionalCategory" },
+        { "url": "persons", "name": "Person" },
+        { "url": "roomtypes", "name": "RoomType" },
+        { "url": "buildings", "name": "Building" },
+        { "url": "roomequipment", "name": "RoomEquipment" },
+        
+        { "url": "procedures", "name": "[Procedure]" },
+        { "url": "medicinedoses", "name": "MedicineDose" },
+        { "url": "proceduremedicines", "name": "ProcedureMedicines" },
+        { "url": "diagnosishistories", "name": "DiagnosisHistory" },
+        { "url": "educations", "name": "Education" },
+        { "url": "medicalworkerprofcategories", "name": "MedicalWorkerProfCategories" },
+        { "url": "residencehistories", "name": "ResidenceHistory" },
+        { "url": "roomequipmentsets", "name": "RoomEquipmentSet" },
+        { "url": "rooms", "name": "Room" },
+        { "url": "roomproceduretypes", "name": "RoomProcedureType" },
+        { "url": "estimateddiseases", "name": "EstimatedDiseases" },
+        { "url": "actualdiseases", "name": "ActualDiseases" },
+        { "url": "medicalworkers", "name": "MedicalWorker" },
+        { "url": "patients", "name": "Patient" }
+    ]
+}

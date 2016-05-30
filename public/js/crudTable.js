@@ -1,4 +1,5 @@
 $(document).ready(() => {
+  tableURL = $('#pagination').data('url');
   $('#pagination').twbsPagination({
     totalPages: $('#pagination').data('total'),
     visiblePages: 20,
@@ -10,7 +11,7 @@ $(document).ready(() => {
 
 let requestPage = (page) => {
   $.ajax({
-    url: `/buildings?page=${page}${generateFilter(true)}`,
+    url: `/table/${tableURL}?page=${page}${generateFilter(true)}`,
     method: 'GET'
   }).fail((jqXHR, textStatus) => {
     alert('Request failed: ' + textStatus);
@@ -31,7 +32,7 @@ let renderTable = (data, sortNumber, asc) => {
     let th = $('<th></th>').text(`${header} `)
       .click(function (e) {
         e.stopPropagation();
-        let url = `/buildings?order=${header}&asc=`;
+        let url = `/table/${tableURL}?order=${header}&asc=`;
         let asc = !($(this).children('span').attr('class').split(' ').some((c) => c == 'glyphicon-sort-by-attributes'));
         $.ajax({
           method: 'GET',
@@ -144,8 +145,7 @@ let openEditModal = (modalName, modalId, method, url, record) => {
         }).fail((jqXHR, textStatus) => {
           alert("Request failed: " + textStatus);
         });
-      })
-      .attr('action', '/bulding').attr('method', 'post').attr('id', 'edit-form');
+      }).attr('method', 'post').attr('id', 'edit-form');
 
     $('#data-table > thead th').each(function (i) {
       let label = $(this).text();
@@ -207,20 +207,20 @@ let openEditModal = (modalName, modalId, method, url, record) => {
 $('#edit-btn').click(() => {
   let record = $('#data-table > tbody > tr[class$="active"]');
   if (!record.length) return;
-  openEditModal('Record Editor', 'edit-modal', 'PUT', `/building/${record.data('id')}${generateFilter()}`, record);
+  openEditModal('Record Editor', 'edit-modal', 'PUT', `/table/${tableURL}/${record.data('id')}${generateFilter()}`, record);
 });
 
 $('#new-btn').click(() => {
-  openEditModal('New Record', 'new-modal', 'POST', `/building${generateFilter()}`);
+  openEditModal('New Record', 'new-modal', 'POST', `/table/${tableURL}${generateFilter()}`);
 });
 
 $('#delete-btn').click(() => {
   let record = $('#data-table > tbody > tr[class$="active"]');
   if (!record.length) return;
-  openDeleteModal('Delete Record', 'delete-modal', `/building/${record.data('id')}${generateFilter()}`);
+  openDeleteModal('Delete Record', 'delete-modal', `/table/${tableURL}/${record.data('id')}${generateFilter()}`);
 });
 
-let filterQuery = '';
+let filterQuery = '', tableURL = '';
 let generateFilter = (appendingForm) => {
   return filterQuery ? `${appendingForm ? '&' : '?'}${filterQuery}` : '';
 }
@@ -245,7 +245,7 @@ $('#filter-btn').click(() => {
   query = `filter=${column}&value=${value}`;
   $.ajax({
     method: 'GET',
-    url: `/buildings?${query}`
+    url: `/table/${tableURL}?${query}`
   }).done((data) => {
     refreshTable(data);
     createFilterResetButton();
