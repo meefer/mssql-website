@@ -16,8 +16,8 @@ app.disable('x-powered-by');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/table/', tableRoutes);
 app.use('/', mainRoutes);
+app.use('/table/', tableRoutes);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
