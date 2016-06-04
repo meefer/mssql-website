@@ -8,7 +8,7 @@ module.exports = function (qb) {
       if (!req.query.page && !req.query.order && !req.query.filter) {
         crudServ.selectColumns(table.name, 'COUNT(*) AS total')
           .then((resultset) => {
-            res.render('buildings.handlebars', { total: Math.ceil(resultset[0].total / recordCount), table });
+            res.render('crud.handlebars', { total: Math.ceil(resultset[0].total / recordCount), table });
           }).catch(next);
       } else {
         crudServ.selectAll(table.name, req.query)

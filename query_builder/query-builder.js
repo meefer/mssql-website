@@ -177,7 +177,7 @@ class QueryBuilder {
     return this.connect.then(() => {
       let fn = null, req = new sql.Request();
       if(params) {
-        params.forEach((paramObj) => { req.input(paramObj.name, paramObj.value); })
+        params.forEach((paramObj) => { req.input(paramObj.name, paramObj.value); });
       }
       if (mode !== 'select')
         fn = () => { return Promise.resolve(req.rowsAffected); };

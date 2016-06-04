@@ -1,0 +1,39 @@
+<div class="panel panel-primary">
+    <div class="panel-heading">{{table.name}}</div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3 col-sm-4">
+                <div class="btn-group">
+                    <button type="button" id="new-btn" class="btn btn-primary">New</button>
+                    <button type="button" id="edit-btn" class="btn btn-primary">Edit</button>
+                    <button type="button" id="delete-btn" class="btn btn-primary">Delete</button>
+                </div>
+            </div>
+            <div class="col-md-5 col-md-offset-4 col-sm-8">
+                <div class = "input-group">
+                    <input type = "text" id="column-input" class = "form-control">
+                    <span class = "input-group-btn">
+                        <button type="button" id="dropdown-btn" class="btn btn-default btn-grouped dropdown-toggle" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu" id="column-dropdown" aria-labelledby="dropdown-btn"></ul>
+                        <button type="button" id="filter-btn" class="btn btn-primary">Filter</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <div id="page-content"></div>
+        {{#unless total}}
+            <h2 class="h4 text-center">There is no data yet...</h2>
+        {{/unless}}
+    </div>
+</div>
+
+<div class="text-center">
+    <ul id="pagination" class="pagination-sm" data-total="{{total}}" data-url="{{table.url}}"></ul>
+</div>
+
+<script src="/js/jquery.twbsPagination.min.js"></script>
+<script src="/js/reducedTable.js"></script>
+<script src="/js/patients.js"></script>
