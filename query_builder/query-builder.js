@@ -128,7 +128,7 @@ class QueryBuilder {
   }
 
   _where(delimiter, raw = '', ...args) {
-    if (delimiter) this.expr.where += ` ${delimiter} `;
+    if (delimiter && (raw || args.length)) this.expr.where += ` ${delimiter} `;
     this.expr.where += `${raw} ${args[0] || ''} ${args[1] || ''}`.trim();
     return this;
   }

@@ -1,0 +1,12 @@
+<form id="move-form" class="form-horizontal">
+  <div class="form-group">
+        <p class="col-sm-3 control-label">Choose new room:</p>
+        <div class="col-sm-6">
+          <select multiple class="form-control" id="room-select" name="room-select">
+            {{#each this}}
+              <option value={{Id}}>{{Ward}}</option>
+            {{/each}}
+          </select>
+        </div>
+  </div>
+</form>

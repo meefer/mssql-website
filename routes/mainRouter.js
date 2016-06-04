@@ -18,6 +18,11 @@ router.get('/about', (req, res, next) => {
 });
 /***** Residence *****/
 router.get('/patients/:id/residence', residenceController.getPatientResidence);
+router.get('/patients/:id/residence/move', residenceController.getMovePatientForm);
+router.post('/patients/:id/residence/move', bodyParser.urlencoded({ extended: true }), residenceController.movePatient);
+router.get('/patients/:id/residence/edit/:recordid', residenceController.getEditForm);
+router.put('/patients/:id/residence/edit/:recordid', bodyParser.urlencoded({ extended: true }), residenceController.editResidenceHistory);
+router.delete('/patients/:id/residence/:recordid', residenceController.deletePatientResidence);
 /***** Patients ******/
 router.get('/patients', patientController.getPatients);
 router.get('/patients/:id/edit', patientController.editPatient);
