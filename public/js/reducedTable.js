@@ -1,5 +1,7 @@
-let initializePagination = () => {
+let callbackFunc;
+let initializePagination = (callback) => {
   tableURL = $('#pagination').data('url');
+  callbackFunc = callback;
   $('#pagination').twbsPagination({
     totalPages: $('#pagination').data('total'),
     visiblePages: 20,
@@ -75,6 +77,7 @@ let renderTable = (data, sortNumber, asc) => {
   table.append(tHead);
   table.append(tBody);
   $('#page-content').append(table);
+  if(callbackFunc) callbackFunc();
 }
 
 let createModal = (name, id, fill) => {

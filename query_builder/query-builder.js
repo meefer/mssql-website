@@ -144,22 +144,27 @@ class QueryBuilder {
     return this._where('AND', raw, ...args);
   }
 
-  join(tableMap) { // tableMap => [ 'Person AS p': false, ... ] where 'false' stands for 'do not reverse'
-    let prevAlias = '', prevTableName = '';
-    for (let [table, reversed] of tableMap) {
-      let [tableName, , alias] = table.split(' ');
-      if (!this.tables) {
-        this.tables = table;
-      }
-      else {
-        if (!reversed) {
-          this.tables += ` JOIN ${table} ON ${prevAlias}.Id = ${alias}.${prevTableName}Id`;
+  join(tableMap, raw) { // tableMap => [ 'Person AS p': false, ... ] where 'false' stands for 'do not reverse'
+    if(!raw) {
+      let prevAlias = '', prevTableName = '';
+      for (let [table, reversed] of tableMap) {
+        let [tableName, , alias] = table.split(' ');
+        if (!this.tables) {
+          this.tables = table;
         }
         else {
-          this.tables += ` JOIN ${table} ON ${alias}.Id = ${prevAlias}.${tableName}Id`;
+          if (!reversed) {
+            this.tables += ` JOIN ${table} ON ${prevAlias}.Id = ${alias}.${prevTableName}Id`;
+          }
+          else {
+            this.tables += ` JOIN ${table} ON ${alias}.Id = ${prevAlias}.${tableName}Id`;
+          }
         }
+        [prevAlias, prevTableName] = [alias, tableName];
       }
-      [prevAlias, prevTableName] = [alias, tableName];
+    }
+    else {
+      this.tables = tableMap; // raw
     }
     return this;
   }
@@ -177,7 +182,10 @@ class QueryBuilder {
     return this.connect.then(() => {
       let fn = null, req = new sql.Request();
       if(params) {
-        params.forEach((paramObj) => { req.input(paramObj.name, paramObj.value); });
+        params.forEach((paramObj) => { 
+          if(paramObj.type) req.input(paramObj.name, paramObj.type, paramObj.value); 
+          else req.input(paramObj.name, paramObj.value); 
+        });
       }
       if (mode !== 'select')
         fn = () => { return Promise.resolve(req.rowsAffected); };

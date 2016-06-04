@@ -22,6 +22,11 @@ body {
   height: 50px;
 }
 
+#person {
+  width: 125px;
+  height: 125px;
+}
+
 input[type="file"] {
   display: none;
 }

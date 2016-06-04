@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const qb = require('../query_builder/qb');
 const bodyParser = require('body-parser');
-const patient = require('../controllers/patientController.js')(qb);
+const patientController = require('../controllers/patientController.js')(qb);
+const residenceController = require('../controllers/residenceController.js')(qb);
 const qsTables = require('../tableConfig.json').quickStartTables;
 const multipart = require('connect-multiparty');
 const multipartMiddleware = multipart();
@@ -15,10 +16,15 @@ router.get('/', (req, res, next) => {
 router.get('/about', (req, res, next) => {
   res.render('about');
 });
-
-router.get('/patients', patient.getPatients);
-router.get('/patients/new', patient.getPatientForm);
-router.post('/patients/new', multipartMiddleware, patient.postPatientForm);
-router.get('/photo', patient.getPhoto);
+/***** Residence *****/
+router.get('/patients/:id/residence', residenceController.getPatientResidence);
+/***** Patients ******/
+router.get('/patients', patientController.getPatients);
+router.get('/patients/:id/edit', patientController.editPatient);
+router.put('/patients/:id/edit', multipartMiddleware, patientController.putPatient);
+router.get('/patients/:id', patientController.getPatientInfo);
+router.get('/patients/new', patientController.getPatientForm);
+router.post('/patients/new', multipartMiddleware, patientController.postPatientForm);
+router.delete('/patients/:id', patientController.deletePatient);
 
 module.exports = router;
